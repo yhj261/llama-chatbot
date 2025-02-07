@@ -8,4 +8,5 @@ vllm serve $MODEL_PATH \
 --max-model-len 4096 \
 --port $PORT \
 --enable-auto-tool-choice \
---tool-call-parser llama3_json
+--tool-call-parser llama3_json \
+--chat-template /home/yhj2263/projects/llama-chatbot/src/api/huggingface_chat_template.jinja
