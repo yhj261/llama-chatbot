@@ -17,34 +17,50 @@ def get_query_messages(messages):
 
 
 # Streamlit UI Setup
-st.set_page_config(page_title="Chatbot", layout="wide")
+st.set_page_config(page_title="Multi-Agent ChatBot", layout="wide")
 
 # Sidebar Configuration
 st.sidebar.header("Settings")
 
-# Select LLM Agent
-model = st.sidebar.selectbox("Select LLM Agent", ["ChatBot", "RAG Agent", "Data Agent"])
+tab1, tab2 = st.sidebar.tabs(["Agents", "Settings"])
 
-model_param_expander = st.sidebar.expander("Model Parameters")
+with tab2:
+    # Temperature Slider
+    temperature = st.slider("Temperature", 0.0, 2.0, 1.0, 0.05)
 
-# Temperature Slider
-temperature = model_param_expander.slider("Temperature", 0.0, 1.0, 0.7, 0.05)
+    # Max Token Slider
+    max_tokens = st.slider("Max Tokens", 1024, 4096 * 2, 4096, 1024)
 
-# Max Token Slider
-max_tokens = model_param_expander.slider("Max Tokens", 1024, 4096 * 2, 4096, 1024)
+    # Top_p Slider
+    top_p = st.slider("Top-p", 0.0, 1.0, 0.1, 0.05)
 
-# Top_p Slider
-top_p = model_param_expander.slider("Top-p", 0.0, 1.0, 1.0, 0.05)
+    # Penalize repetitive text
+    repeat_penalty = st.slider("Repetition Penalty", 0.0, 2.0, 0.0, 0.05)
 
-# Clear Chat Button
-if st.sidebar.button("Clear Chat"):
-    st.session_state.messages = []
+    # Encourage topic diversity
+    presence_penalty = st.slider("Presence Penalty", 0.0, 2.0, 0.0, 0.05)
 
-# System Message Customization
-st.sidebar.header("System Message")
-st.session_state.system_message = st.sidebar.text_area(
-    "Enter system message", "You are a helpful AI assistant."
-)
+with tab1:
+    # Select LLM Agent
+    agent = st.selectbox("Select LLM Agent", ["ChatBot", "RAG Agent", "Data Agent"])
+
+    # Sidebar Model Parameters
+    if agent == "RAG Agent":
+        st.header("RAG Agent Options")
+        uploaded_file = st.file_uploader("Upload PDF", type=["pdf"], key="pdf_upload")
+        search_query = st.text_input("Search PDF Content", key="search_query")
+        search_result = st.text_area("Search Result", "", key="search_result")
+
+    # Clear Chat Button
+
+    # System Message Customization
+    st.header("System Message")
+    st.session_state.system_message = st.text_area(
+        "Enter system message", "You are a helpful AI assistant."
+    )
+
+    if st.button("Clear Chat", type="primary"):
+        st.session_state.messages = []
 
 # Initialize session state
 if "messages" not in st.session_state:
@@ -52,7 +68,7 @@ if "messages" not in st.session_state:
 
 # Display Chat Messages
 st.title("My Chatbot")
-st.write(f"Interact with an AI-powered {model}")
+st.write(f"Interact with an AI-powered Chatbot")
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -71,7 +87,8 @@ if user_input:
     client = ChatOpenAI(
         base_url="http://localhost:11434/v1",
         api_key="dummy",
-        model="llama3.1",
+        # model="llama3.1",
+        model="deepseek-r1:32b",
         temperature=temperature,  # Adjust creativity level
         max_tokens=max_tokens,  # Limit response length
         top_p=top_p,  # Nucleus sampling
