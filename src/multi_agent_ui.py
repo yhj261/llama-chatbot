@@ -1,6 +1,7 @@
 import streamlit as st
 from components.sidebar import render_sidebar
 from components.chat import render_chat_interface
+from components.sn_agent import render_sn_agent_interface
 
 
 def init_session_state():
@@ -19,8 +20,13 @@ def main():
     # Get sidebar configuration
     agent, settings = render_sidebar()
 
-    # Render main chat interface
-    render_chat_interface(settings, agent)
+    # Render appropriate interface based on selected agent
+    if agent == "SN Agent":
+        # Render the SN Agent interface
+        render_sn_agent_interface()
+    else:
+        # Render main chat interface
+        render_chat_interface(settings, agent)
 
 
 if __name__ == "__main__":

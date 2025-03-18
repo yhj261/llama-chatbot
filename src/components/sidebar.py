@@ -30,7 +30,9 @@ def render_settings_tab():
 def render_agents_tab():
     """Render the agents tab in the sidebar"""
     # Select LLM Agent
-    agent = st.selectbox("Select LLM Agent", ["ChatBot", "RAG Agent", "Data Agent"])
+    agent = st.selectbox(
+        "Select LLM Agent", ["ChatBot", "RAG Agent", "Data Agent", "SN Agent"]
+    )
 
     # Sidebar Model Parameters
     if agent == "RAG Agent":
@@ -40,13 +42,14 @@ def render_agents_tab():
         search_result = st.text_area("Search Result", "", key="search_result")
 
     # System Message Customization
-    st.header("System Message")
-    st.session_state.system_message = st.text_area(
-        "Enter system message", "You are a helpful AI assistant."
-    )
+    if agent != "SN Agent":  # Don't show system message for SN Agent
+        st.header("System Message")
+        st.session_state.system_message = st.text_area(
+            "Enter system message", "You are a helpful AI assistant."
+        )
 
-    if st.button("Clear Chat", type="primary"):
-        st.session_state.messages = []
+        if st.button("Clear Chat", type="primary"):
+            st.session_state.messages = []
 
     return agent
 
